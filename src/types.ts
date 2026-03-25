@@ -3,18 +3,13 @@ export interface DocumentMetadata {
   project: string
   filePath: string
   section: string
-  layer: string
-  entities: string[]
-  service?: string
-  capabilities?: string[]
-  boundedContext?: string
+  tags: Record<string, string | string[]>
   checksum: string
 }
 
 export interface DocumentFilter {
   project?: string | string[]
-  layer?: string | string[]
-  service?: string | string[]
+  tags?: Record<string, string | string[]>
   filePath?: string
 }
 
@@ -40,7 +35,7 @@ export interface SearchResult {
 
 export interface IngestOptions {
   project?: string
-  layer?: string
+  tags?: Record<string, string | string[]>
 }
 
 export interface IngestResult {
@@ -55,7 +50,7 @@ export interface Chunk {
   metadata: Partial<DocumentMetadata>
 }
 
-export type RelationshipType = 'consumes' | 'implements' | 'extends' | 'references' | 'tests'
+export type RelationshipType = string
 
 export interface Relationship {
   sourceId: string
@@ -80,7 +75,7 @@ export interface ImpactReport {
   directMatches: SearchResult[]
   relatedDocuments: RelatedDocument[]
   affectedProjects: string[]
-  affectedLayers: string[]
+  affectedTags: Record<string, string[]>
   summary: string
 }
 
@@ -97,6 +92,11 @@ export interface Watcher {
 export interface ProjectConfig {
   name: string
   paths: string[]
+}
+
+export interface TagRule {
+  pattern: string | RegExp
+  tags: Record<string, string | string[]>
 }
 
 export interface VectorStoreConfig {

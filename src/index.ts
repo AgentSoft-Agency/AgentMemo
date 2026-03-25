@@ -15,6 +15,7 @@ export type {
   WatchOptions,
   Watcher,
   ProjectConfig,
+  TagRule,
   VectorStoreConfig,
 } from './types.js'
 
