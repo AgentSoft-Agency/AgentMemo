@@ -1,11 +1,9 @@
 // src/mcp/tools.ts
 import type { Memo } from '../core/memo.js'
 import type { SearchResult, ImpactReport, IngestResult } from '../types.js'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js'
 
-interface ToolResult {
-  content: { type: 'text'; text: string }[]
-  isError?: boolean
-}
+type ToolResult = Pick<CallToolResult, 'content' | 'isError'>
 
 export async function handleIngest(
   memo: Memo,
