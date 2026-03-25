@@ -19,7 +19,7 @@ export class PlainTextChunker implements ChunkingStrategy {
 
   chunk(content: string, metadata: DocumentMetadata): Chunk[] {
     if (content.length <= this.chunkSize) {
-      return [{ content, metadata: { filePath: metadata.filePath, project: metadata.project, layer: metadata.layer } }]
+      return [{ content, metadata: { filePath: metadata.filePath, project: metadata.project, tags: { ...metadata.tags } } }]
     }
 
     const chunks: Chunk[] = []
@@ -29,7 +29,7 @@ export class PlainTextChunker implements ChunkingStrategy {
       const end = Math.min(start + this.chunkSize, content.length)
       chunks.push({
         content: content.slice(start, end),
-        metadata: { filePath: metadata.filePath, project: metadata.project, layer: metadata.layer },
+        metadata: { filePath: metadata.filePath, project: metadata.project, tags: { ...metadata.tags } },
       })
       if (end === content.length) break
       start += this.chunkSize - this.overlap

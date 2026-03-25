@@ -26,12 +26,12 @@ export class OpenAPIChunker implements ChunkingStrategy {
     for (const [path, methods] of Object.entries(spec.paths ?? {})) {
       for (const [method, operation] of Object.entries(methods as Record<string, any>)) {
         if (['get', 'post', 'put', 'patch', 'delete'].includes(method)) {
-          const tags = operation.tags ?? []
+          const operationTags = operation.tags ?? []
           const summary = operation.summary ?? ''
           const chunkContent = [
             `${method.toUpperCase()} ${path}`,
             summary ? `Summary: ${summary}` : '',
-            tags.length ? `Tags: ${tags.join(', ')}` : '',
+            operationTags.length ? `Tags: ${operationTags.join(', ')}` : '',
             operation.requestBody ? `Request Body: ${JSON.stringify(operation.requestBody, null, 2)}` : '',
             operation.responses ? `Responses: ${JSON.stringify(operation.responses, null, 2)}` : '',
           ].filter(Boolean).join('\n')
@@ -41,10 +41,8 @@ export class OpenAPIChunker implements ChunkingStrategy {
             metadata: {
               filePath: metadata.filePath,
               project: metadata.project,
-              layer: 'api',
+              tags: { ...metadata.tags, service: serviceName, capabilities: operationTags },
               section: `${method.toUpperCase()} ${path}`,
-              service: serviceName,
-              capabilities: tags,
             },
           })
         }

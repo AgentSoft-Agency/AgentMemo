@@ -9,8 +9,7 @@ const baseMeta: DocumentMetadata = {
   project: 'test',
   filePath: '/test/api.yaml',
   section: '',
-  layer: 'api',
-  entities: [],
+  tags: {},
   checksum: 'abc123',
 }
 
@@ -40,13 +39,13 @@ describe('OpenAPIChunker', () => {
   it('extracts service name from info.title', () => {
     const content = readFileSync(resolve(__dirname, '../../../tests/fixtures/sample-openapi.yaml'), 'utf-8')
     const chunks = chunker.chunk(content, baseMeta)
-    expect(chunks[0].metadata.service).toBe('User Service')
+    expect(chunks[0].metadata.tags?.service).toBe('User Service')
   })
 
   it('extracts capabilities from tags', () => {
     const content = readFileSync(resolve(__dirname, '../../../tests/fixtures/sample-openapi.yaml'), 'utf-8')
     const chunks = chunker.chunk(content, baseMeta)
     const authChunk = chunks.find(c => c.content.includes('/auth/login'))
-    expect(authChunk?.metadata.capabilities).toContain('auth')
+    expect(authChunk?.metadata.tags?.capabilities as string[]).toContain('auth')
   })
 })

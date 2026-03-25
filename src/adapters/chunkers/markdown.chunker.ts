@@ -16,7 +16,7 @@ export class MarkdownChunker implements ChunkingStrategy {
   chunk(content: string, metadata: DocumentMetadata): Chunk[] {
     const headings = this.parseHeadings(content)
     if (headings.length === 0) {
-      return [{ content, metadata: { filePath: metadata.filePath, project: metadata.project, layer: metadata.layer, section: '' } }]
+      return [{ content, metadata: { filePath: metadata.filePath, project: metadata.project, tags: { ...metadata.tags }, section: '' } }]
     }
 
     const chunks: Chunk[] = []
@@ -44,7 +44,7 @@ export class MarkdownChunker implements ChunkingStrategy {
           metadata: {
             filePath: metadata.filePath,
             project: metadata.project,
-            layer: metadata.layer,
+            tags: { ...metadata.tags },
             section: sectionPath,
           },
         })

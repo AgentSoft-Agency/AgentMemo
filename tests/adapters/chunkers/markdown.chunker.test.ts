@@ -9,8 +9,7 @@ const baseMeta: DocumentMetadata = {
   project: 'test',
   filePath: '/test/doc.md',
   section: '',
-  layer: 'business',
-  entities: [],
+  tags: {},
   checksum: 'abc123',
 }
 

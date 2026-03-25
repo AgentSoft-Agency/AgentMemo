@@ -21,7 +21,7 @@ export class CodeChunker implements ChunkingStrategy {
     }
 
     if (boundaries.length === 0) {
-      return [{ content, metadata: { filePath: metadata.filePath, project: metadata.project, layer: metadata.layer } }]
+      return [{ content, metadata: { filePath: metadata.filePath, project: metadata.project, tags: { ...metadata.tags } } }]
     }
 
     const chunks: Chunk[] = []
@@ -35,9 +35,8 @@ export class CodeChunker implements ChunkingStrategy {
         metadata: {
           filePath: metadata.filePath,
           project: metadata.project,
-          layer: metadata.layer,
+          tags: { ...metadata.tags, entities: [boundaries[i].name] },
           section: boundaries[i].name,
-          entities: [boundaries[i].name],
         },
       })
     }
