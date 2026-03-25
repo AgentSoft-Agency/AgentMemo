@@ -4,6 +4,9 @@
   "description": "Embedded vector-based document storage with cross-project impact analysis for coding agents",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "agent-memo": "dist/mcp/cli.js"
+  },
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
@@ -18,7 +21,9 @@
     "test:watch": "vitest",
     "prepare": "husky"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -28,12 +33,14 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@lancedb/lancedb": "^0.15.0",
     "@huggingface/transformers": "^3.4.0",
+    "@lancedb/lancedb": "^0.15.0",
+    "@modelcontextprotocol/sdk": "^1.28.0",
+    "apache-arrow": "^19.0.0",
     "chokidar": "^4.0.0",
     "glob": "^11.0.0",
     "yaml": "^2.7.0",
-    "apache-arrow": "^19.0.0"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
