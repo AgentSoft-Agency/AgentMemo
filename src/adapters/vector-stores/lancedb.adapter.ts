@@ -31,11 +31,7 @@ export class LanceDBAdapter implements VectorStore {
       project: doc.metadata.project,
       filePath: doc.metadata.filePath,
       section: doc.metadata.section,
-      layer: doc.metadata.layer,
-      entities: JSON.stringify(doc.metadata.entities),
-      service: doc.metadata.service ?? '',
-      capabilities: JSON.stringify(doc.metadata.capabilities ?? []),
-      boundedContext: doc.metadata.boundedContext ?? '',
+      tags: JSON.stringify(doc.metadata.tags),
       checksum: doc.metadata.checksum,
     }))
 
@@ -74,11 +70,7 @@ export class LanceDBAdapter implements VectorStore {
           project: row.project as string,
           filePath: row.filePath as string,
           section: row.section as string,
-          layer: row.layer as string,
-          entities: JSON.parse(row.entities as string),
-          service: (row.service as string) || undefined,
-          capabilities: row.capabilities ? JSON.parse(row.capabilities as string) : undefined,
-          boundedContext: (row.boundedContext as string) || undefined,
+          tags: JSON.parse(row.tags as string),
           checksum: row.checksum as string,
         },
         chunk: { index: 0, total: 1 },
@@ -104,13 +96,13 @@ export class LanceDBAdapter implements VectorStore {
       const projects = Array.isArray(filter.project) ? filter.project : [filter.project]
       conditions.push(`project IN (${projects.map(p => `'${p}'`).join(', ')})`)
     }
-    if (filter.layer) {
-      const layers = Array.isArray(filter.layer) ? filter.layer : [filter.layer]
-      conditions.push(`layer IN (${layers.map(l => `'${l}'`).join(', ')})`)
-    }
-    if (filter.service) {
-      const services = Array.isArray(filter.service) ? filter.service : [filter.service]
-      conditions.push(`service IN (${services.map(s => `'${s}'`).join(', ')})`)
+    if (filter.tags) {
+      for (const [key, value] of Object.entries(filter.tags)) {
+        const values = Array.isArray(value) ? value : [value]
+        for (const v of values) {
+          conditions.push(`tags LIKE '%"${key}":"${v}"%'`)
+        }
+      }
     }
     if (filter.filePath) {
       conditions.push(`filePath LIKE '${filter.filePath.replace(/\*/g, '%')}'`)

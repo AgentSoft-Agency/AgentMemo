@@ -10,8 +10,7 @@ const makeMeta = (overrides: Partial<DocumentMetadata> = {}): DocumentMetadata =
   project: 'test',
   filePath: '/test/file.md',
   section: 'intro',
-  layer: 'business',
-  entities: [],
+  tags: {},
   checksum: 'abc',
   ...overrides,
 })
@@ -58,6 +57,19 @@ describe('LanceDBAdapter', () => {
       filter: { project: 'test' },
     })
     expect(results.every(r => r.metadata.project === 'test')).toBe(true)
+  })
+
+  it('filters by tags', async () => {
+    await adapter.addDocuments([
+      { ...makeDoc('doc-1', [1, 0, 0, 0]), metadata: makeMeta({ id: 'doc-1', tags: { team: 'alpha' } }) },
+      { ...makeDoc('doc-2', [1, 0, 0, 0]), metadata: makeMeta({ id: 'doc-2', tags: { team: 'beta' } }) },
+    ])
+    const results = await adapter.search([1, 0, 0, 0], {
+      limit: 10,
+      filter: { tags: { team: 'alpha' } },
+    })
+    expect(results.length).toBeGreaterThan(0)
+    expect(results.every(r => r.metadata.tags.team === 'alpha')).toBe(true)
   })
 
   it('deletes documents by filter', async () => {
