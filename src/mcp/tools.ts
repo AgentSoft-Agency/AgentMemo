@@ -7,12 +7,12 @@ type ToolResult = Pick<CallToolResult, 'content' | 'isError'>
 
 export async function handleIngest(
   memo: Memo,
-  params: { source: string | string[]; project?: string; layer?: string },
+  params: { source: string | string[]; project?: string; tags?: Record<string, string | string[]> },
 ): Promise<ToolResult> {
   try {
-    const options: Record<string, string> = {}
+    const options: Record<string, unknown> = {}
     if (params.project) options.project = params.project
-    if (params.layer) options.layer = params.layer
+    if (params.tags) options.tags = params.tags
     const result = await memo.ingest(params.source, options)
     return { content: [{ type: 'text', text: formatIngestResult(result) }] }
   } catch (err) {
@@ -123,6 +123,13 @@ export function formatAnalyzeReport(report: ImpactReport): string {
       const rd = report.relatedDocuments[i]
       lines.push(`${i + 1}. ${rd.result.metadata.id} (${rd.relationship.type}, depth ${rd.depth})`)
     }
+    lines.push('')
+  }
+  if (report.affectedTags && Object.keys(report.affectedTags).length > 0) {
+    const tagParts = Object.entries(report.affectedTags)
+      .map(([key, values]) => `${key}: ${values.join(', ')}`)
+      .join('; ')
+    lines.push(`Tags: ${tagParts}`)
     lines.push('')
   }
   return lines.join('\n').trim()

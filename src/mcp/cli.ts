@@ -7,12 +7,30 @@ import { readFile } from 'node:fs/promises'
 import { resolve, join, dirname } from 'node:path'
 import { homedir } from 'node:os'
 import { fileURLToPath } from 'node:url'
+import type { TagRule, ProjectConfig } from '../types.js'
+
+async function loadConfig(storagePath: string): Promise<{ tagRules?: TagRule[]; projects?: ProjectConfig[] }> {
+  try {
+    const configPath = join(storagePath, 'config.json')
+    const data = JSON.parse(await readFile(configPath, 'utf-8'))
+    return {
+      tagRules: data.tagRules?.map((rule: any) => ({
+        ...rule,
+        pattern: typeof rule.pattern === 'string' ? new RegExp(rule.pattern, 'i') : rule.pattern,
+      })),
+      projects: data.projects,
+    }
+  } catch {
+    return {}
+  }
+}
 
 async function main(): Promise<void> {
   const storagePath = parseStoragePath()
   const version = await readVersion()
 
-  const memo = await createMemo({ storagePath })
+  const config = await loadConfig(storagePath)
+  const memo = await createMemo({ storagePath, ...config })
   const server = createMcpServer(memo, version)
   const transport = new StdioServerTransport()
 

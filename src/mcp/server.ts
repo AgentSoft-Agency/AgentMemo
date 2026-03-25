@@ -19,7 +19,7 @@ export function createMcpServer(memo: Memo, version: string): McpServer {
       inputSchema: {
         source: z.union([z.string(), z.array(z.string())]).describe('File paths, directory paths, or glob patterns to ingest'),
         project: z.string().optional().describe('Override auto-detected project name'),
-        layer: z.string().optional().describe('Override auto-detected layer (business, data, software-arch, ux-ui, api, infrastructure)'),
+        tags: z.record(z.string(), z.union([z.string(), z.array(z.string())])).optional().describe('Override tags for ingested documents'),
       },
     },
     async (params) => handleIngest(memo, params),
@@ -28,15 +28,14 @@ export function createMcpServer(memo: Memo, version: string): McpServer {
   server.registerTool(
     'memo_search',
     {
-      description: 'Semantic search across ingested documentation. Returns ranked results with file paths, scores, and content snippets. Use filters to narrow by project, layer, or service.',
+      description: 'Semantic search across ingested documentation. Returns ranked results with file paths, scores, and content snippets. Use filters to narrow by project or tags.',
       inputSchema: {
         query: z.string().describe('Natural language search query'),
         limit: z.number().int().min(1).max(50).default(10).describe('Maximum number of results'),
         threshold: z.number().min(0).max(1).optional().describe('Minimum similarity score (0-1)'),
         filter: z.object({
           project: z.union([z.string(), z.array(z.string())]).optional().describe('Filter by project name(s)'),
-          layer: z.union([z.string(), z.array(z.string())]).optional().describe('Filter by layer(s)'),
-          service: z.union([z.string(), z.array(z.string())]).optional().describe('Filter by service name(s)'),
+          tags: z.record(z.string(), z.union([z.string(), z.array(z.string())])).optional().describe('Filter by tag values (e.g., { "layer": "api" })'),
         }).optional().describe('Metadata filters'),
       },
     },
@@ -60,13 +59,12 @@ export function createMcpServer(memo: Memo, version: string): McpServer {
   server.registerTool(
     'memo_find_existing',
     {
-      description: 'Discover existing service capabilities to prevent building duplicate functionality. Searches by capability description and returns matching services/modules. Use this before creating new services or endpoints.',
+      description: 'Discover existing capabilities to prevent building duplicate functionality. Searches by capability description and returns matching documents/modules. Use this before creating new services or endpoints.',
       inputSchema: {
         capability: z.string().describe('Capability description (e.g., "JWT authentication", "payment processing")'),
         filter: z.object({
           project: z.union([z.string(), z.array(z.string())]).optional().describe('Filter by project name(s)'),
-          layer: z.union([z.string(), z.array(z.string())]).optional().describe('Filter by layer(s)'),
-          service: z.union([z.string(), z.array(z.string())]).optional().describe('Filter by service name(s)'),
+          tags: z.record(z.string(), z.union([z.string(), z.array(z.string())])).optional().describe('Filter by tag values (e.g., { "layer": "api" })'),
         }).optional().describe('Metadata filters'),
       },
     },
@@ -80,7 +78,7 @@ export function createMcpServer(memo: Memo, version: string): McpServer {
       inputSchema: {
         sourceId: z.string().describe('Source document/chunk ID (from search result metadata.id)'),
         targetId: z.string().describe('Target document/chunk ID (from search result metadata.id)'),
-        type: z.enum(['consumes', 'implements', 'extends', 'references', 'tests']).describe('Relationship type'),
+        type: z.string().describe('Relationship type (e.g., "consumes", "implements", "references")'),
       },
     },
     async (params) => handleRelate(memo, params),
