@@ -1,0 +1,42 @@
+openapi: '3.1.0'
+info:
+  title: User Service
+  version: '1.0.0'
+tags:
+  - name: users
+  - name: auth
+paths:
+  /users:
+    get:
+      tags: [users]
+      summary: List users
+      responses:
+        '200':
+          description: OK
+    post:
+      tags: [users]
+      summary: Create user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+      responses:
+        '201':
+          description: Created
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: User login
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    CreateUser:
+      type: object
+      properties:
+        email:
+          type: string
+        name:
+          type: string
