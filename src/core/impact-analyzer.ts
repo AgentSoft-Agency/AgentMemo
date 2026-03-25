@@ -22,7 +22,7 @@ export class ImpactAnalyzer {
           result: {
             content: '',
             score: 0,
-            metadata: { id: relatedId, project: '', filePath: '', section: '', layer: '', entities: [], checksum: '' },
+            metadata: { id: relatedId, project: '', filePath: '', section: '', tags: {}, checksum: '' },
             chunk: { index: 0, total: 1 },
           },
           relationship: rel,
@@ -33,23 +33,36 @@ export class ImpactAnalyzer {
 
     const allResults = [...directMatches, ...relatedDocuments.map(r => r.result)]
     const affectedProjects = [...new Set(allResults.map(r => r.metadata.project).filter(Boolean))]
-    const affectedLayers = [...new Set(allResults.map(r => r.metadata.layer).filter(Boolean))]
+    const affectedTags: Record<string, string[]> = {}
+    for (const result of allResults) {
+      for (const [key, value] of Object.entries(result.metadata.tags)) {
+        if (!affectedTags[key]) affectedTags[key] = []
+        const values = Array.isArray(value) ? value : [value]
+        for (const v of values) {
+          if (!affectedTags[key].includes(v)) affectedTags[key].push(v)
+        }
+      }
+    }
 
     return {
       directMatches,
       relatedDocuments,
       affectedProjects,
-      affectedLayers,
-      summary: this.generateSummary(directMatches.length, relatedDocuments.length, affectedProjects, affectedLayers),
+      affectedTags,
+      summary: this.generateSummary(directMatches.length, relatedDocuments.length, affectedProjects, affectedTags),
     }
   }
 
-  private generateSummary(directCount: number, relatedCount: number, projects: string[], layers: string[]): string {
+  private generateSummary(directCount: number, relatedCount: number, projects: string[], tags: Record<string, string[]>): string {
     const parts: string[] = []
     parts.push(`Found ${directCount} direct match${directCount !== 1 ? 'es' : ''}`)
     if (relatedCount > 0) parts.push(`${relatedCount} related document${relatedCount !== 1 ? 's' : ''}`)
     if (projects.length > 0) parts.push(`affecting ${projects.length} project${projects.length !== 1 ? 's' : ''} (${projects.join(', ')})`)
-    if (layers.length > 0) parts.push(`across ${layers.length} layer${layers.length !== 1 ? 's' : ''} (${layers.join(', ')})`)
+    const tagEntries = Object.entries(tags)
+    if (tagEntries.length > 0) {
+      const tagParts = tagEntries.map(([key, values]) => `${key}: ${values.join(', ')}`)
+      parts.push(`across tags {${tagParts.join('; ')}}`)
+    }
     return parts.join(', ') + '.'
   }
 }

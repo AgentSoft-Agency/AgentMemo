@@ -13,8 +13,7 @@ function makeResult(id: string, project: string, layer: string): SearchResult {
       project,
       filePath: `/path/${id}.md`,
       section: 'main',
-      layer,
-      entities: [],
+      tags: { layer },
       checksum: `checksum-${id}`,
     },
     chunk: { index: 0, total: 1 },
@@ -69,8 +68,8 @@ describe('ImpactAnalyzer', () => {
 
     expect(report.affectedProjects).toContain('projectA')
     expect(report.affectedProjects).toContain('projectB')
-    expect(report.affectedLayers).toContain('domain')
-    expect(report.affectedLayers).toContain('application')
+    expect(report.affectedTags.layer).toContain('domain')
+    expect(report.affectedTags.layer).toContain('application')
   })
 
   it('generates a summary string', async () => {
