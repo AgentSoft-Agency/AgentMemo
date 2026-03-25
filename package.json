@@ -1,0 +1,54 @@
+{
+  "name": "@agentsoft/agent-memo",
+  "version": "0.1.0",
+  "description": "Embedded vector-based document storage with cross-project impact analysis for coding agents",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepare": "husky"
+  },
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "packageManager": "pnpm@10.28.2",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@lancedb/lancedb": "^0.15.0",
+    "@huggingface/transformers": "^3.4.0",
+    "chokidar": "^4.0.0",
+    "glob": "^11.0.0",
+    "yaml": "^2.7.0",
+    "apache-arrow": "^19.0.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
+    "@types/node": "^25.5.0",
+    "husky": "^9.1.7",
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.1"
+  },
+  "peerDependencies": {
+    "openai": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "openai": {
+      "optional": true
+    }
+  }
+}
