@@ -21,6 +21,7 @@ describe('FileWatcher', () => {
 
   it('detects file creation', async () => {
     const watcher = new FileWatcher([tmpDir], onChangeMock, onDeleteMock, { debounceMs: 100 })
+    await new Promise(resolve => setTimeout(resolve, 300))
     await writeFile(join(tmpDir, 'new.md'), 'hello')
     await new Promise(resolve => setTimeout(resolve, 500))
     expect(onChangeMock).toHaveBeenCalledWith(expect.stringContaining('new.md'))
