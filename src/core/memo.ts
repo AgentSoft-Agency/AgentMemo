@@ -1,7 +1,7 @@
 import type {
   IngestOptions, IngestResult, SearchOptions, SearchResult,
   AnalyzeOptions, ImpactReport, WatchOptions, Watcher as WatcherInterface,
-  ProjectConfig, RelationshipType,
+  ProjectConfig, RelationshipType, TagRule,
 } from '../types.js'
 import type { VectorStore } from '../ports/vector-store.port.js'
 import type { EmbeddingProvider } from '../ports/embedding-provider.port.js'
@@ -26,6 +26,7 @@ export interface MemoConfig {
   embedding?: EmbeddingProvider
   chunkers?: ChunkingStrategy[]
   projects?: ProjectConfig[]
+  tagRules?: TagRule[]
 }
 
 export class Memo {
@@ -112,7 +113,7 @@ export async function createMemo(config: MemoConfig): Promise<Memo> {
   await registry.load()
   const graph = new RelationshipGraph(config.storagePath)
   await graph.load()
-  const extractor = new MetadataExtractor(config.projects ?? [])
+  const extractor = new MetadataExtractor(config.projects ?? [], config.tagRules ?? [])
   return new Memo(vectorStore, embedding, chunkers, registry, graph, extractor)
 }
 

@@ -29,10 +29,10 @@ describe('Tool Handlers', () => {
       expect(result.content[0].text).toContain('1 updated')
     })
 
-    it('passes project and layer overrides', async () => {
+    it('passes project and tags overrides', async () => {
       mockMemo.ingest = vi.fn().mockResolvedValue({ added: 1, updated: 0, skipped: 0, errors: [] })
-      await handleIngest(mockMemo, { source: '/docs', project: 'my-app', layer: 'api' })
-      expect(mockMemo.ingest).toHaveBeenCalledWith('/docs', { project: 'my-app', layer: 'api' })
+      await handleIngest(mockMemo, { source: '/docs', project: 'my-app', tags: { layer: 'api' } })
+      expect(mockMemo.ingest).toHaveBeenCalledWith('/docs', { project: 'my-app', tags: { layer: 'api' } })
     })
 
     it('reports errors in output', async () => {
@@ -51,7 +51,7 @@ describe('Tool Handlers', () => {
       mockMemo.search = vi.fn().mockResolvedValue([{
         content: 'JWT authentication for login',
         score: 0.92,
-        metadata: { id: 'doc-1', project: 'auth', filePath: '/auth/README.md', section: 'Auth', layer: 'api', entities: [], checksum: 'abc' },
+        metadata: { id: 'doc-1', project: 'auth', filePath: '/auth/README.md', section: 'Auth', tags: {}, checksum: 'abc' },
         chunk: { index: 0, total: 1 },
       }])
       const result = await handleSearch(mockMemo, { query: 'authentication' })
@@ -78,12 +78,12 @@ describe('Tool Handlers', () => {
       mockMemo.analyze = vi.fn().mockResolvedValue({
         directMatches: [{
           content: 'User API endpoint', score: 0.9,
-          metadata: { id: 'doc-1', project: 'users', filePath: '/api.yaml', section: 'GET /users', layer: 'api', entities: [], checksum: 'abc' },
+          metadata: { id: 'doc-1', project: 'users', filePath: '/api.yaml', section: 'GET /users', tags: {}, checksum: 'abc' },
           chunk: { index: 0, total: 1 },
         }],
         relatedDocuments: [],
         affectedProjects: ['users'],
-        affectedLayers: ['api'],
+        affectedTags: { layer: ['api'] },
         summary: 'Found 1 direct match, affecting 1 project (users) across 1 layer (api).',
       })
       const result = await handleAnalyze(mockMemo, { query: 'user endpoint' })
