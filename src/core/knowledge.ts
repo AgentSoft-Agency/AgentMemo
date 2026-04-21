@@ -20,7 +20,7 @@ import { ImpactAnalyzer } from './impact-analyzer.js'
 import { FileWatcher } from './watcher.js'
 import { mkdir } from 'node:fs/promises'
 
-export interface MemoConfig {
+export interface KnowledgeConfig {
   storagePath: string
   vectorStore?: VectorStore
   embedding?: EmbeddingProvider
@@ -29,7 +29,7 @@ export interface MemoConfig {
   tagRules?: TagRule[]
 }
 
-export class Memo {
+export class Knowledge {
   private ingestionEngine: IngestionEngine
   private searchEngine: SearchEngine
   private impactAnalyzer: ImpactAnalyzer
@@ -101,7 +101,7 @@ export class Memo {
   }
 }
 
-export async function createMemo(config: MemoConfig): Promise<Memo> {
+export async function createKnowledge(config: KnowledgeConfig): Promise<Knowledge> {
   await mkdir(config.storagePath, { recursive: true })
   const vectorStore = config.vectorStore ?? new LanceDBAdapter()
   const embedding = config.embedding ?? await getDefaultEmbedding()
@@ -114,7 +114,7 @@ export async function createMemo(config: MemoConfig): Promise<Memo> {
   const graph = new RelationshipGraph(config.storagePath)
   await graph.load()
   const extractor = new MetadataExtractor(config.projects ?? [], config.tagRules ?? [])
-  return new Memo(vectorStore, embedding, chunkers, registry, graph, extractor)
+  return new Knowledge(vectorStore, embedding, chunkers, registry, graph, extractor)
 }
 
 async function getDefaultEmbedding(): Promise<EmbeddingProvider> {
