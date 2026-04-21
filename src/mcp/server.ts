@@ -1,10 +1,10 @@
 // src/mcp/server.ts
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
-import type { Memo } from '../core/memo.js'
+import type { Knowledge } from '../core/knowledge.js'
 import { handleIngest, handleSearch, handleAnalyze, handleFindExisting, handleRelate } from './tools.js'
 
-export function createMcpServer(memo: Memo, version: string): McpServer {
+export function createMcpServer(knowledge: Knowledge, version: string): McpServer {
   const server = new McpServer(
     { name: 'agent-memo', version },
     {
@@ -22,7 +22,7 @@ export function createMcpServer(memo: Memo, version: string): McpServer {
         tags: z.record(z.string(), z.union([z.string(), z.array(z.string())])).optional().describe('Override tags for ingested documents'),
       },
     },
-    async (params) => handleIngest(memo, params),
+    async (params) => handleIngest(knowledge, params),
   )
 
   server.registerTool(
@@ -39,7 +39,7 @@ export function createMcpServer(memo: Memo, version: string): McpServer {
         }).optional().describe('Metadata filters'),
       },
     },
-    async (params) => handleSearch(memo, params),
+    async (params) => handleSearch(knowledge, params),
   )
 
   server.registerTool(
@@ -53,7 +53,7 @@ export function createMcpServer(memo: Memo, version: string): McpServer {
         includeIndirect: z.boolean().default(true).describe('Follow transitive relationships'),
       },
     },
-    async (params) => handleAnalyze(memo, params),
+    async (params) => handleAnalyze(knowledge, params),
   )
 
   server.registerTool(
@@ -68,7 +68,7 @@ export function createMcpServer(memo: Memo, version: string): McpServer {
         }).optional().describe('Metadata filters'),
       },
     },
-    async (params) => handleFindExisting(memo, params),
+    async (params) => handleFindExisting(knowledge, params),
   )
 
   server.registerTool(
@@ -81,7 +81,7 @@ export function createMcpServer(memo: Memo, version: string): McpServer {
         type: z.string().describe('Relationship type (e.g., "consumes", "implements", "references")'),
       },
     },
-    async (params) => handleRelate(memo, params),
+    async (params) => handleRelate(knowledge, params),
   )
 
   return server

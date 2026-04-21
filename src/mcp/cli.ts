@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // src/mcp/cli.ts
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
-import { createMemo } from '../core/memo.js'
+import { createKnowledge } from '../core/knowledge.js'
 import { createMcpServer } from './server.js'
 import { readFile } from 'node:fs/promises'
 import { resolve, join, dirname } from 'node:path'
@@ -30,12 +30,12 @@ async function main(): Promise<void> {
   const version = await readVersion()
 
   const config = await loadConfig(storagePath)
-  const memo = await createMemo({ storagePath, ...config })
-  const server = createMcpServer(memo, version)
+  const knowledge = await createKnowledge({ storagePath, ...config })
+  const server = createMcpServer(knowledge, version)
   const transport = new StdioServerTransport()
 
   const shutdown = async () => {
-    await memo.dispose()
+    await knowledge.dispose()
     process.exit(0)
   }
   process.on('SIGINT', shutdown)

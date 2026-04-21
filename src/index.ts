@@ -33,4 +33,4 @@ export { CodeChunker } from './adapters/chunkers/code.chunker.js'
 export { PlainTextChunker } from './adapters/chunkers/plaintext.chunker.js'
 
 // Factory
-export { createMemo } from './core/memo.js'
+export { createKnowledge } from './core/knowledge.js'
