@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [Unreleased]
+
+### BREAKING CHANGE
+
+- Renamed package from `@agentsoft/agent-memo` to `@agentsoft/agent-knowledge`.
+- Renamed bin from `agent-memo` to `agent-knowledge`.
+- Renamed MCP server identifier from `agent-memo` to `agent-knowledge`.
+- Renamed all MCP tools: `memo_ingest` → `knowledge_ingest`, `memo_search` → `knowledge_search`, `memo_analyze` → `knowledge_analyze`, `memo_find_existing` → `knowledge_find_existing`, `memo_relate` → `knowledge_relate`.
+- Renamed exported core symbol: `createMemo` → `createKnowledge`, `Memo` type → `Knowledge`.
+- Default storage path changed from `~/.agent-memo` to `~/.agent-knowledge`. **Existing users must move their data manually:** `mv ~/.agent-memo ~/.agent-knowledge`.
+
+### Migration
+
+Consumers calling `mcp__agent-memo__memo_*` tools must update their client configuration to `mcp__agent-knowledge__knowledge_*`. No schema changes — only names.
+
 ## 0.1.0 (2026-03-25)
 
 
