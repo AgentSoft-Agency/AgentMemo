@@ -9,7 +9,7 @@ describe('DocumentRegistry', () => {
   let registry: DocumentRegistry
 
   beforeEach(async () => {
-    tmpDir = await mkdtemp(join(tmpdir(), 'memo-test-'))
+    tmpDir = await mkdtemp(join(tmpdir(), 'knowledge-test-'))
     registry = new DocumentRegistry(tmpDir)
     await registry.load()
   })

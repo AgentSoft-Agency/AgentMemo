@@ -1,19 +1,19 @@
 // src/mcp/tools.ts
-import type { Memo } from '../core/memo.js'
+import type { Knowledge } from '../core/knowledge.js'
 import type { SearchResult, ImpactReport, IngestResult } from '../types.js'
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js'
 
 type ToolResult = Pick<CallToolResult, 'content' | 'isError'>
 
 export async function handleIngest(
-  memo: Memo,
+  knowledge: Knowledge,
   params: { source: string | string[]; project?: string; tags?: Record<string, string | string[]> },
 ): Promise<ToolResult> {
   try {
     const options: Record<string, unknown> = {}
     if (params.project) options.project = params.project
     if (params.tags) options.tags = params.tags
-    const result = await memo.ingest(params.source, options)
+    const result = await knowledge.ingest(params.source, options)
     return { content: [{ type: 'text', text: formatIngestResult(result) }] }
   } catch (err) {
     return { isError: true, content: [{ type: 'text', text: `Ingestion failed: ${err instanceof Error ? err.message : String(err)}` }] }
@@ -21,14 +21,14 @@ export async function handleIngest(
 }
 
 export async function handleSearch(
-  memo: Memo,
+  knowledge: Knowledge,
   params: { query: string; limit?: number; threshold?: number; filter?: Record<string, unknown> },
 ): Promise<ToolResult> {
   try {
     const options: Record<string, unknown> = { limit: params.limit ?? 10 }
     if (params.threshold) options.threshold = params.threshold
     if (params.filter) options.filter = params.filter
-    const results = await memo.search(params.query, options)
+    const results = await knowledge.search(params.query, options)
     return { content: [{ type: 'text', text: formatSearchResults(results) }] }
   } catch (err) {
     return { isError: true, content: [{ type: 'text', text: `Search failed: ${err instanceof Error ? err.message : String(err)}` }] }
@@ -36,7 +36,7 @@ export async function handleSearch(
 }
 
 export async function handleAnalyze(
-  memo: Memo,
+  knowledge: Knowledge,
   params: { query: string; depth?: number; project?: string | string[]; includeIndirect?: boolean },
 ): Promise<ToolResult> {
   try {
@@ -44,7 +44,7 @@ export async function handleAnalyze(
     if (params.depth !== undefined) options.depth = params.depth
     if (params.project) options.project = params.project
     if (params.includeIndirect !== undefined) options.includeIndirect = params.includeIndirect
-    const report = await memo.analyze(params.query, options)
+    const report = await knowledge.analyze(params.query, options)
     return { content: [{ type: 'text', text: formatAnalyzeReport(report) }] }
   } catch (err) {
     return { isError: true, content: [{ type: 'text', text: `Analysis failed: ${err instanceof Error ? err.message : String(err)}` }] }
@@ -52,13 +52,13 @@ export async function handleAnalyze(
 }
 
 export async function handleFindExisting(
-  memo: Memo,
+  knowledge: Knowledge,
   params: { capability: string; filter?: Record<string, unknown> },
 ): Promise<ToolResult> {
   try {
     const options: Record<string, unknown> = {}
     if (params.filter) options.filter = params.filter
-    const results = await memo.findExisting(params.capability, options)
+    const results = await knowledge.findExisting(params.capability, options)
     return { content: [{ type: 'text', text: formatSearchResults(results) }] }
   } catch (err) {
     return { isError: true, content: [{ type: 'text', text: `Find existing failed: ${err instanceof Error ? err.message : String(err)}` }] }
@@ -66,11 +66,11 @@ export async function handleFindExisting(
 }
 
 export async function handleRelate(
-  memo: Memo,
+  knowledge: Knowledge,
   params: { sourceId: string; targetId: string; type: string },
 ): Promise<ToolResult> {
   try {
-    await memo.relate(params.sourceId, params.targetId, params.type as never)
+    await knowledge.relate(params.sourceId, params.targetId, params.type as never)
     return { content: [{ type: 'text', text: `Relationship registered: ${params.sourceId} --[${params.type}]--> ${params.targetId}` }] }
   } catch (err) {
     return { isError: true, content: [{ type: 'text', text: `Relate failed: ${err instanceof Error ? err.message : String(err)}` }] }

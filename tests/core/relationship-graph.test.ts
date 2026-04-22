@@ -9,7 +9,7 @@ describe('RelationshipGraph', () => {
   let graph: RelationshipGraph
 
   beforeEach(async () => {
-    tmpDir = await mkdtemp(join(tmpdir(), 'memo-test-'))
+    tmpDir = await mkdtemp(join(tmpdir(), 'knowledge-test-'))
     graph = new RelationshipGraph(tmpDir)
     await graph.load()
   })

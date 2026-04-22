@@ -1,11 +1,11 @@
 {
-  "name": "@agentsoft/agent-memo",
+  "name": "@agentsoft/agent-knowledge",
   "version": "0.1.0",
-  "description": "Embedded vector-based document storage with cross-project impact analysis for coding agents",
+  "description": "Embedded vector-based knowledge base with cross-project impact analysis for coding agents",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "agent-memo": "dist/mcp/cli.js"
+    "agent-knowledge": "dist/mcp/cli.js"
   },
   "types": "dist/index.d.ts",
   "exports": {

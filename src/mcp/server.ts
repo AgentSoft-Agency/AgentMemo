@@ -1,19 +1,19 @@
 // src/mcp/server.ts
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
-import type { Memo } from '../core/memo.js'
+import type { Knowledge } from '../core/knowledge.js'
 import { handleIngest, handleSearch, handleAnalyze, handleFindExisting, handleRelate } from './tools.js'
 
-export function createMcpServer(memo: Memo, version: string): McpServer {
+export function createMcpServer(knowledge: Knowledge, version: string): McpServer {
   const server = new McpServer(
-    { name: 'agent-memo', version },
+    { name: 'agent-knowledge', version },
     {
-      instructions: 'agent-memo provides semantic search over project documentation. Use memo_search to find relevant docs, memo_ingest to add new docs, memo_analyze for cross-project impact analysis, memo_find_existing to discover existing service capabilities, and memo_relate to register dependencies between documents.',
+      instructions: 'agent-knowledge provides semantic search over project documentation. Use knowledge_search to find relevant docs, knowledge_ingest to add new docs, knowledge_analyze for cross-project impact analysis, knowledge_find_existing to discover existing service capabilities, and knowledge_relate to register dependencies between documents.',
     },
   )
 
   server.registerTool(
-    'memo_ingest',
+    'knowledge_ingest',
     {
       description: 'Ingest files or directories into the knowledge base. Supports markdown, OpenAPI YAML/JSON, and code files. Uses checksums for incremental sync — unchanged files are skipped on re-ingest.',
       inputSchema: {
@@ -22,11 +22,11 @@ export function createMcpServer(memo: Memo, version: string): McpServer {
         tags: z.record(z.string(), z.union([z.string(), z.array(z.string())])).optional().describe('Override tags for ingested documents'),
       },
     },
-    async (params) => handleIngest(memo, params),
+    async (params) => handleIngest(knowledge, params),
   )
 
   server.registerTool(
-    'memo_search',
+    'knowledge_search',
     {
       description: 'Semantic search across ingested documentation. Returns ranked results with file paths, scores, and content snippets. Use filters to narrow by project or tags.',
       inputSchema: {
@@ -39,11 +39,11 @@ export function createMcpServer(memo: Memo, version: string): McpServer {
         }).optional().describe('Metadata filters'),
       },
     },
-    async (params) => handleSearch(memo, params),
+    async (params) => handleSearch(knowledge, params),
   )
 
   server.registerTool(
-    'memo_analyze',
+    'knowledge_analyze',
     {
       description: 'Cross-project impact analysis. Combines semantic search with relationship graph traversal to show blast radius of a change. Returns affected projects, layers, and related documents.',
       inputSchema: {
@@ -53,11 +53,11 @@ export function createMcpServer(memo: Memo, version: string): McpServer {
         includeIndirect: z.boolean().default(true).describe('Follow transitive relationships'),
       },
     },
-    async (params) => handleAnalyze(memo, params),
+    async (params) => handleAnalyze(knowledge, params),
   )
 
   server.registerTool(
-    'memo_find_existing',
+    'knowledge_find_existing',
     {
       description: 'Discover existing capabilities to prevent building duplicate functionality. Searches by capability description and returns matching documents/modules. Use this before creating new services or endpoints.',
       inputSchema: {
@@ -68,11 +68,11 @@ export function createMcpServer(memo: Memo, version: string): McpServer {
         }).optional().describe('Metadata filters'),
       },
     },
-    async (params) => handleFindExisting(memo, params),
+    async (params) => handleFindExisting(knowledge, params),
   )
 
   server.registerTool(
-    'memo_relate',
+    'knowledge_relate',
     {
       description: 'Register an explicit dependency between two documents/chunks. Use IDs from search results. This enriches impact analysis by adding known relationships that vector similarity alone cannot detect.',
       inputSchema: {
@@ -81,7 +81,7 @@ export function createMcpServer(memo: Memo, version: string): McpServer {
         type: z.string().describe('Relationship type (e.g., "consumes", "implements", "references")'),
       },
     },
-    async (params) => handleRelate(memo, params),
+    async (params) => handleRelate(knowledge, params),
   )
 
   return server

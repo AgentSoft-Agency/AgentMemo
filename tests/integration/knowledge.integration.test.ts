@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { createMemo } from '../../src/core/memo.js'
+import { createKnowledge } from '../../src/core/knowledge.js'
 import { mkdtemp, rm, writeFile, mkdir } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -17,12 +17,12 @@ class MockEmbedding implements EmbeddingProvider {
   }
 }
 
-describe('Memo integration', () => {
+describe('Knowledge integration', () => {
   let tmpDir: string
   let docsDir: string
 
   beforeEach(async () => {
-    tmpDir = await mkdtemp(join(tmpdir(), 'memo-integration-'))
+    tmpDir = await mkdtemp(join(tmpdir(), 'knowledge-integration-'))
     docsDir = join(tmpDir, 'docs')
     await mkdir(docsDir, { recursive: true })
   })
@@ -34,59 +34,59 @@ describe('Memo integration', () => {
   it('ingests files and searches them', async () => {
     await writeFile(join(docsDir, 'auth.md'), '# Authentication\n\nJWT-based authentication for user login.')
     await writeFile(join(docsDir, 'payments.md'), '# Payments\n\nStripe integration for payment processing.')
-    const memo = await createMemo({
-      storagePath: join(tmpDir, '.agent-memo'),
+    const knowledge = await createKnowledge({
+      storagePath: join(tmpDir, '.agent-knowledge'),
       embedding: new MockEmbedding(),
       projects: [{ name: 'my-app', paths: [docsDir] }],
     })
-    const result = await memo.ingest(docsDir)
+    const result = await knowledge.ingest(docsDir)
     expect(result.added).toBe(2)
-    const searchResults = await memo.search('authentication')
+    const searchResults = await knowledge.search('authentication')
     expect(searchResults.length).toBeGreaterThan(0)
-    await memo.dispose()
+    await knowledge.dispose()
   })
 
   it('skips unchanged files on re-ingest', async () => {
     await writeFile(join(docsDir, 'doc.md'), '# Document\n\nSome content.')
-    const memo = await createMemo({
-      storagePath: join(tmpDir, '.agent-memo'),
+    const knowledge = await createKnowledge({
+      storagePath: join(tmpDir, '.agent-knowledge'),
       embedding: new MockEmbedding(),
     })
-    await memo.ingest(docsDir)
-    const result2 = await memo.ingest(docsDir)
+    await knowledge.ingest(docsDir)
+    const result2 = await knowledge.ingest(docsDir)
     expect(result2.skipped).toBe(1)
     expect(result2.added).toBe(0)
-    await memo.dispose()
+    await knowledge.dispose()
   })
 
   it('supports explicit relationships and impact analysis', async () => {
     await writeFile(join(docsDir, 'api.md'), '# User API\n\nGET /users endpoint.')
     await writeFile(join(docsDir, 'frontend.md'), '# User Page\n\nDisplays user list from API.')
-    const memo = await createMemo({
-      storagePath: join(tmpDir, '.agent-memo'),
+    const knowledge = await createKnowledge({
+      storagePath: join(tmpDir, '.agent-knowledge'),
       embedding: new MockEmbedding(),
     })
-    await memo.ingest(docsDir)
-    const apiResults = await memo.search('user API')
-    const feResults = await memo.search('user page')
+    await knowledge.ingest(docsDir)
+    const apiResults = await knowledge.search('user API')
+    const feResults = await knowledge.search('user page')
     if (apiResults.length > 0 && feResults.length > 0) {
-      await memo.relate(apiResults[0].metadata.id, feResults[0].metadata.id, 'consumes')
+      await knowledge.relate(apiResults[0].metadata.id, feResults[0].metadata.id, 'consumes')
     }
-    const report = await memo.analyze('user endpoint changes')
+    const report = await knowledge.analyze('user endpoint changes')
     expect(report.directMatches.length).toBeGreaterThanOrEqual(0)
     expect(report.summary).toBeDefined()
-    await memo.dispose()
+    await knowledge.dispose()
   })
 
   it('findExisting returns matching capabilities', async () => {
     await writeFile(join(docsDir, 'auth-service.md'), '# Auth Service\n\nHandles JWT authentication and session management.')
-    const memo = await createMemo({
-      storagePath: join(tmpDir, '.agent-memo'),
+    const knowledge = await createKnowledge({
+      storagePath: join(tmpDir, '.agent-knowledge'),
       embedding: new MockEmbedding(),
     })
-    await memo.ingest(docsDir)
-    const results = await memo.findExisting('authentication')
+    await knowledge.ingest(docsDir)
+    const results = await knowledge.findExisting('authentication')
     expect(results.length).toBeGreaterThanOrEqual(0)
-    await memo.dispose()
+    await knowledge.dispose()
   })
 })
