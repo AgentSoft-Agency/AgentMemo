@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { createMemo } from '../../src/core/memo.js'
+import { createKnowledge } from '../../src/core/knowledge.js'
 import { mkdtemp, rm, writeFile, mkdir } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -17,7 +17,7 @@ class MockEmbedding implements EmbeddingProvider {
   }
 }
 
-describe('Memo integration', () => {
+describe('Knowledge integration', () => {
   let tmpDir: string
   let docsDir: string
 
@@ -34,8 +34,8 @@ describe('Memo integration', () => {
   it('ingests files and searches them', async () => {
     await writeFile(join(docsDir, 'auth.md'), '# Authentication\n\nJWT-based authentication for user login.')
     await writeFile(join(docsDir, 'payments.md'), '# Payments\n\nStripe integration for payment processing.')
-    const memo = await createMemo({
-      storagePath: join(tmpDir, '.agent-memo'),
+    const memo = await createKnowledge({
+      storagePath: join(tmpDir, '.agent-knowledge'),
       embedding: new MockEmbedding(),
       projects: [{ name: 'my-app', paths: [docsDir] }],
     })
@@ -48,8 +48,8 @@ describe('Memo integration', () => {
 
   it('skips unchanged files on re-ingest', async () => {
     await writeFile(join(docsDir, 'doc.md'), '# Document\n\nSome content.')
-    const memo = await createMemo({
-      storagePath: join(tmpDir, '.agent-memo'),
+    const memo = await createKnowledge({
+      storagePath: join(tmpDir, '.agent-knowledge'),
       embedding: new MockEmbedding(),
     })
     await memo.ingest(docsDir)
@@ -62,8 +62,8 @@ describe('Memo integration', () => {
   it('supports explicit relationships and impact analysis', async () => {
     await writeFile(join(docsDir, 'api.md'), '# User API\n\nGET /users endpoint.')
     await writeFile(join(docsDir, 'frontend.md'), '# User Page\n\nDisplays user list from API.')
-    const memo = await createMemo({
-      storagePath: join(tmpDir, '.agent-memo'),
+    const memo = await createKnowledge({
+      storagePath: join(tmpDir, '.agent-knowledge'),
       embedding: new MockEmbedding(),
     })
     await memo.ingest(docsDir)
@@ -80,8 +80,8 @@ describe('Memo integration', () => {
 
   it('findExisting returns matching capabilities', async () => {
     await writeFile(join(docsDir, 'auth-service.md'), '# Auth Service\n\nHandles JWT authentication and session management.')
-    const memo = await createMemo({
-      storagePath: join(tmpDir, '.agent-memo'),
+    const memo = await createKnowledge({
+      storagePath: join(tmpDir, '.agent-knowledge'),
       embedding: new MockEmbedding(),
     })
     await memo.ingest(docsDir)

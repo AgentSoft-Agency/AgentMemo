@@ -7,7 +7,7 @@ import {
   handleFindExisting,
   handleRelate,
 } from '../../src/mcp/tools.js'
-import type { Memo } from '../../src/core/memo.js'
+import type { Knowledge } from '../../src/core/knowledge.js'
 
 const mockMemo = {
   ingest: vi.fn(),
@@ -15,7 +15,7 @@ const mockMemo = {
   analyze: vi.fn(),
   findExisting: vi.fn(),
   relate: vi.fn(),
-} as unknown as Memo
+} as unknown as Knowledge
 
 describe('Tool Handlers', () => {
   beforeEach(() => { vi.clearAllMocks() })
