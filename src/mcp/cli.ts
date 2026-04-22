@@ -47,7 +47,7 @@ async function main(): Promise<void> {
 function parseStoragePath(): string {
   const args = process.argv.slice(2)
   const storageIndex = args.indexOf('--storage')
-  let storagePath = join(homedir(), '.agent-memo')
+  let storagePath = join(homedir(), '.agent-knowledge')
   if (storageIndex !== -1 && args[storageIndex + 1]) {
     storagePath = args[storageIndex + 1]
   }
@@ -69,6 +69,6 @@ async function readVersion(): Promise<string> {
 }
 
 main().catch((err) => {
-  console.error('agent-memo MCP server failed to start:', err)
+  console.error('agent-knowledge MCP server failed to start:', err)
   process.exit(1)
 })
