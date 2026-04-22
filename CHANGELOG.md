@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [Unreleased]
 
-### BREAKING CHANGE
+### BREAKING CHANGES
 
 - Renamed package from `@agentsoft/agent-memo` to `@agentsoft/agent-knowledge`.
 - Renamed bin from `agent-memo` to `agent-knowledge`.
